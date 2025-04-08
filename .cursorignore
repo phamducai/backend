@@ -1,0 +1,58 @@
+# Thư mục build và cache
+node_modules/
+dist/
+build/
+.cache/
+.next/
+out/
+
+# Tệp cấu hình môi trường và bí mật
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env.*
+secrets/
+
+# Tệp log và dữ liệu
+*.log
+logs/
+data/
+
+# Tệp và thư mục tạm
+.tmp/
+temp/
+tmp/
+*.tmp
+
+# Thư mục IDE và trình soạn thảo
+.idea/
+.vscode/
+*.sublime-*
+.DS_Store
+
+# Tệp dịch và biên dịch
+*.min.js
+*.min.css
+*.compiled.*
+*.bundle.*
+
+# Thư mục large assets
+assets/videos/
+public/videos/
+assets/images/large/
+uploads/
+
+# Tệp dữ liệu lớn
+*.csv
+*.json
+*.xml
+*.parquet
+*.sqlite
+*.db
+
+# Mã khác
+legacy/
+experimental/
+vendor/

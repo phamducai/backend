@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model comments {
+  id        String   @id @db.VarChar(36)
+  content   String   @db.Text
+  postId    String   @db.VarChar(36)
+  authorId  String   @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+  posts     posts    @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comments_ibfk_1")
+  users     users    @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comments_ibfk_2")
+
+  @@index([authorId], map: "idx_comments_authorId")
+  @@index([postId], map: "idx_comments_postId")
+}
+
+model posts {
+  id        String     @id @db.VarChar(36)
+  title     String     @db.VarChar(255)
+  content   String     @db.Text
+  authorId  String     @db.VarChar(36)
+  published Boolean    @default(true)
+  createdAt DateTime   @default(now()) @db.DateTime(0)
+  updatedAt DateTime   @default(now()) @db.DateTime(0)
+  comments  comments[]
+  users     users      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "posts_ibfk_1")
+
+  @@index([authorId], map: "idx_posts_authorId")
+}
+
+model users {
+  id        String     @id @db.VarChar(36)
+  email     String     @unique(map: "email") @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  createdAt DateTime   @default(now()) @db.DateTime(0)
+  updatedAt DateTime   @default(now()) @db.DateTime(0)
+  comments  comments[]
+  posts     posts[]
+}
