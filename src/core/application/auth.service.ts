@@ -1,9 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../domain/user.entity';
 import { UserRepositoryPort } from '../ports/out/user-repository.port';
 import { AuthResult, AuthUseCasePort, LoginUserDto, RegisterUserDto } from '../ports/in/auth-use-case.port';
-import { validate } from 'class-validator';
 
 @Injectable()
 export class AuthService implements AuthUseCasePort {
@@ -14,16 +13,10 @@ export class AuthService implements AuthUseCasePort {
   ) {}
 
   async register(userData: RegisterUserDto): Promise<AuthResult> {
-    // Validate DTO
-    const errors = await validate(userData);
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
-    }
-
     // Check if user exists
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new ConflictException('User with this email already exists');
     }
 
     // Create new user
@@ -45,22 +38,16 @@ export class AuthService implements AuthUseCasePort {
   }
 
   async login(credentials: LoginUserDto): Promise<AuthResult> {
-    // Validate DTO
-    const errors = await validate(credentials);
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
-    }
-
     // Find user
     const user = await this.userRepository.findByEmail(credentials.email);
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Validate password
     const isPasswordValid = await user.validatePassword(credentials.password);
     if (!isPasswordValid) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Generate token
